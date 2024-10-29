@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render,get_object_or_404
 from .models import *
 from .forms import *
 from django.contrib.auth.decorators import login_required
@@ -13,7 +13,7 @@ def landing_page(request):
     })
     
 @login_required
-def post_create(request):
+def post_create_wc(request):
     form=postCreateFrom()
     if request.method == "POST":
           form=postCreateFrom(request.POST)
@@ -42,12 +42,23 @@ def post_create(request):
             post.save()
             return redirect('landing-page')
         
-    return render(request,'post-create.html',{
+    return render(request,'post-create_ws.html',{
         'form':form
     })
-
+    
+def post_create(request):
+    form=postCreationFrom()
+    if request.method == "POST":
+        form=postCreationFrom(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('landing-page')  # Redirect after a successful upload
+    return render(request,"post_create_simple.html",{
+            'form':form,
+        })
+        
 def post_delete(request,pk):
-    post=Post.objects.get(id=pk)
+    post=get_object_or_404(Post,id=pk)
     if request.method == 'POST':
         post.delete()
         messages.success(request,'Post Deleted')
@@ -55,3 +66,25 @@ def post_delete(request,pk):
     return render(request,"post_delete.html",{
         "post":post
     })
+    
+    
+def post_edit(request,pk):
+    post=get_object_or_404(Post,id=pk)
+    form = postEditForm(instance=post)
+    if request.method == 'POST':
+        form = postEditForm(request.POST,instance=post)
+        if form.is_valid():
+            form.save()
+            messages.success(request,'Post updated')
+            return redirect('landing-page')
+    
+    return  render(request,'post_edit.html',{
+        'post':post,
+        'form':form
+    })      
+    
+def post_page(request,pk):
+    post=get_object_or_404(Post,id=pk)
+    return render(request,'post_page.html',{
+        'post':post
+    })  
