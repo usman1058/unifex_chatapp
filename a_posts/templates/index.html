@@ -46,13 +46,20 @@
     </mobileSidebarNav>
     <main class="col-span-full md:col-span-2 md:mr-[5%] lg:mx-[10%] order-2 md:order-1">
         {% for post in posts %}
+
         <article class="card">
             <div class="flex items-center justify-between px-4 h-14">
                 <h3 class="text-start leading-5 mr-1">{{ post.title }}</h3>
                 <div class="text-sm text-gray-400 truncate">flickr<a href="{{ post.url }}" class="hover:underline ml-1" target="blank">{{ post.artist }}</a></div>
             </div>
             <figure>
-                <a href="{% url 'post-page' post.id %}"><img class="w-full" src="{{ post.image }}"></a>
+                <a href="{% url 'post-page' post.id %}"><img class="w-full" src="{% if post %}
+                    {{ post.image }}
+                    {% else %}
+                    {{ post.images }}
+                    {% endif %}" 
+
+                    "></a>
             </figure>
             <div class="p-4 pb-2">
                 <a class="flex items-center gap-1 mb-4" href="">

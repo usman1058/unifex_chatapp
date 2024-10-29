@@ -16,8 +16,8 @@ class postCreateFrom(ModelForm):
         }
 class postCreationFrom(ModelForm):
     class Meta:
-        model= Post2
-        fields = ['title','image','body']
+        model= Post
+        fields = ['title','images','body']
         labels={ 'body' : 'caption', }
         widgets={
             'title': forms.Textarea(attrs={ 'rows': 1,'placeholder':'Enter the title ...','class':'p-4 text-black'}),

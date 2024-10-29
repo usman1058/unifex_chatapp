@@ -9,7 +9,7 @@ from django.contrib import messages
 def landing_page(request):
     posts=Post.objects.all()
     return render(request,"index.html",{
-        "posts":posts
+        "posts":posts,
     })
     
 @login_required
