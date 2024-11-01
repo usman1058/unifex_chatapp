@@ -20,14 +20,18 @@ from django.conf.urls.static import static
 from django.conf import settings
 from a_users.views import profile_view
 from a_home.views import *
+from a_posts.views import *
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin1058/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', include('a_rtchat.urls')),
     path('', include('a_posts.urls')),
+    path('<username>', profile_view, name="userprofile"),
     path('profile/', include('a_users.urls')),
     path('@<username>/', profile_view, name="profile"),
+    path('commentsent/<pk>/',comment_sent,name="comment-sent"),
+    path('replysent/<pk>/',reply_sent,name="reply-sent"),
 ]
 
 # Only used when DEBUG=True, whitenoise can serve files when DEBUG=False
