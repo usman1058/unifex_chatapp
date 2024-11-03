@@ -14,6 +14,9 @@ urlpatterns=[
             path('reply-delete/<pk>/',reply_delete,name="reply-delete"),
             path('chat/chat-edit/<pk>/',post_edit,name="post-edit"),
             path('chat/chat-page/<pk>/',post_page,name="post-page"),
+            path('chat-page/<pk>/likes/',like_post,name="like-post"),
+            path('chat-page/<pk>/likes_comment/',like_comment,name="like-comment"),
+            path('chat-page/<pk>/likes_reply/',like_reply,name="like-reply"),
              ]
 
 

@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from bs4 import BeautifulSoup
 import requests 
 from django.contrib import messages
+from django.db.models import Count
 from django.contrib.auth.models import User
 # Create your views here.
 def landing_page(request,tag=None):
@@ -100,6 +101,16 @@ def post_page(request,pk):
     post=get_object_or_404(Post,id=pk)
     commentform=CommentForm()
     replyform=ReplyForm()
+    
+    if request.htmx:
+        if 'top' in request.GET:
+            comments=post.comments.annotate(num_likes=Count('likes')).order_by('-num_likes')
+        else:  
+            comments=post.comments.all()
+        return render(request,'snippets/loop_comments.html',{
+            'comments':comments,
+        })
+    
     return render(request,'post_page.html',{
         'post':post,
          "commentform":commentform,
@@ -107,6 +118,7 @@ def post_page(request,pk):
     }) 
 @login_required
 def comment_sent(request,pk):
+    replyform=ReplyForm()
     post = get_object_or_404(Post, id=pk)
     
     if request.method == 'POST':
@@ -117,7 +129,11 @@ def comment_sent(request,pk):
             comment.parent_post=post
             comment.save()
             
-    return redirect('post-page', post.id)
+    return render(request,"snippets/add_comment.html",{
+        "comment":comment,
+        "post":post,
+        "replyform":replyform
+    })
 
 def comment_delete(request,pk):
     post=get_object_or_404(Comment,id=pk)
@@ -132,6 +148,7 @@ def comment_delete(request,pk):
 @login_required
 def reply_sent(request,pk):
     comment = get_object_or_404(Comment, id=pk)
+    replyform=ReplyForm()
     
     if request.method == 'POST':
         form=ReplyForm(request.POST)
@@ -141,7 +158,12 @@ def reply_sent(request,pk):
             reply.parent_comment=comment
             reply.save()
             
-    return redirect('post-page', comment.parent_post.id)
+    return render(request,"snippets/add_reply.html",{
+        "comment":comment,
+        "reply":reply,
+        "replyform":replyform
+        
+    })
 
 def reply_delete(request,pk):
     reply=get_object_or_404(Reply,id=pk,auther=request.user)
@@ -151,4 +173,45 @@ def reply_delete(request,pk):
         return redirect('post-page',reply.parent_comment.parent_post.id)
     return render(request,"reply_delete.html",{
         "reply":reply 
+    })
+
+
+def like_post(request,pk):
+    post = get_object_or_404(Post, id=pk)
+    user_exist=post.likes.filter(username=request.user.username).exists()
+    
+    if post.auther != request.user:
+        if user_exist:
+            post.likes.remove(request.user)
+        else:   
+            post.likes.add(request.user)
+         
+    return render(request,'snippets/likes.html',{
+        'post':post,
+    })
+def like_comment(request,pk):
+    comment = get_object_or_404(Comment, id=pk)
+    user_exist=comment.likes.filter(username=request.user.username).exists()
+    
+    if comment.auther != request.user:
+        if user_exist:
+            comment.likes.remove(request.user)
+        else:   
+            comment.likes.add(request.user)
+         
+    return render(request,'snippets/likes_comment.html',{
+        'comment':comment,
+    })
+def like_reply(request,pk):
+    reply = get_object_or_404(Reply, id=pk)
+    user_exist=reply.likes.filter(username=request.user.username).exists()
+    
+    if reply.auther != request.user:
+        if user_exist:
+            reply.likes.remove(request.user)
+        else:   
+            reply.likes.add(request.user)
+         
+    return render(request,'snippets/likes_reply.html',{
+        'reply':reply,
     })
