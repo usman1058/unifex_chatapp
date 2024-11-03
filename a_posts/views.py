@@ -14,12 +14,10 @@ def landing_page(request,tag=None):
         tag=get_object_or_404(Tag,slug=tag)
     else:
         posts=Post.objects.all()
-        
-    categories=Tag.objects.all()
+    
     
     return render(request,"index.html",{
         "posts":posts,
-        "categories":categories,
         'tag':tag
     })
 
@@ -114,7 +112,7 @@ def post_page(request,pk):
     return render(request,'post_page.html',{
         'post':post,
          "commentform":commentform,
-         "replyform":replyform
+         "replyform":replyform,
     }) 
 @login_required
 def comment_sent(request,pk):

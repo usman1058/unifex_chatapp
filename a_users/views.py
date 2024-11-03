@@ -16,8 +16,11 @@ def profile_view(request, username=None):
             profile = request.user.profile
         except:
             return redirect_to_login(request.get_full_path())
-    return render(request, 'a_users/profile.html', {'profile':profile})
-
+        
+    posts= profile.user.posts.all()
+    return render(request, 'a_users/profile.html',
+      {'profile':profile,
+       'posts':posts})
 
 @login_required
 def profile_edit_view(request):
