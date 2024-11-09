@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import redirect, render,get_object_or_404
 from .models import *
 from .forms import *
@@ -6,7 +7,9 @@ from bs4 import BeautifulSoup
 import requests 
 from django.contrib import messages
 from django.db.models import Count
+from django.core.paginator import Paginator
 from django.contrib.auth.models import User
+
 # Create your views here.
 def landing_page(request,tag=None):
     if tag:
@@ -14,12 +17,22 @@ def landing_page(request,tag=None):
         tag=get_object_or_404(Tag,slug=tag)
     else:
         posts=Post.objects.all()
-    
-    
-    return render(request,"index.html",{
+        
+    paginator= Paginator(posts, 3)
+    page=int(request.GET.get('page',1))
+    try:
+        posts=paginator.page(page)
+    except:
+        return HttpResponse("")
+    context={
         "posts":posts,
-        'tag':tag
-    })
+        'tag':tag,
+        "page":page
+    }
+    if request.htmx:
+        return render(request,'snippets/loop_home.html',context)
+    
+    return render(request,"index.html",context)
 
     
 @login_required

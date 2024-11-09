@@ -1,7 +1,17 @@
 {% if message.author == user  %}
 <li class="flex justify-end mb-4">
     <div class="bg-green-200 rounded-l-lg rounded-tr-lg p-4 max-w-[75%]">
-        <span>{{ message.body }}</span>
+        {% if message.body %}
+            <span>{{ message.body }}</span>
+        {% elif message.file %}
+            {% if message.is_image %}
+                <img src="{{ message.file.url }}" class="max-w-72 min-w-8"/>
+            {% else %}
+               &#x1F4CE; <a href="{{ message.file.url }}" class="curser-pointer italic hover:underline" download>
+                    {{ message.filename }}
+                </a>
+            {% endif %}
+        {% endif %}
     </div>
     <div class="flex items-end">
         <svg height="13" width="8" >
@@ -23,7 +33,17 @@
             </svg>
         </div>
         <div class="bg-white p-4 max-w-[75%] rounded-r-lg rounded-tl-lg">
+            {% if message.body %}
             <span>{{ message.body }}</span>
+        {% elif message.file %}
+            {% if message.is_image %}
+                <img src="{{ message.file.url }}" class="max-w-72 min-w-8"/>
+            {% else %}
+            &#x1F4CE; <a href="{{ message.file.url }}" class="curser-pointer italic hover:underline" download>
+                    {{ message.filename }}
+                </a>
+            {% endif %}
+        {% endif %}
         </div>  
     </div>
     <div class="text-sm font-light py-1 ml-10">

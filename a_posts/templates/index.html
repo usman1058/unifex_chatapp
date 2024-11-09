@@ -114,6 +114,12 @@ bg-gray-100
             </div>
         </article>
         {% endfor %}
+        <div
+        hx-post="{% url 'landing-page' %}?page={{ page|add:1}}"
+        hx-trigger="revealed"
+        hx-target="this"
+        hx-swap="outerHTML"
+        >Loading</div>
     </main>
     {% load sidebar %}
     {% slidebar_view tag user %}

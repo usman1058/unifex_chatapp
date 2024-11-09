@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django.contrib.auth.models import User
 import shortuuid
@@ -20,11 +21,30 @@ class ChatGroup(models.Model):
 class GroupMessage(models.Model):
     group = models.ForeignKey(ChatGroup, on_delete=models.CASCADE, related_name='chat_messages')
     author=models.ForeignKey(User,on_delete=models.CASCADE)
-    body=models.CharField(max_length=300)
+    body=models.CharField(max_length=300,blank=True,null=True)
+    file= models.FileField(upload_to='files',blank=True,null=True)
     created = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def filename(self):
+        if self.file:
+             return os.path.basename(self.file.name)
+        else:
+            return None
+
     def  __str__(self):
-        return f'{self.author.username} : {self.body}'
+        if self.body:
+             return f'{self.author.username} : {self.body}'
+        elif self.file:
+             return f'{self.author.username} : {self.filename}'
+         
 
     class META:
         ordering = ('-created')  # newest messages first
+        
+    @property
+    def is_image(self):
+        if self.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif','.svg','.webp')):
+            return True
+        else:
+            return False
