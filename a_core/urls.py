@@ -27,6 +27,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('', include('a_rtchat.urls')),
     path('', include('a_posts.urls')),
+    path('inbox/', include('a_inbox.urls')),
     path('<username>', profile_view, name="userprofile"),
     path('profile/', include('a_users.urls')),
     path('@<username>/', profile_view, name="profile"),
